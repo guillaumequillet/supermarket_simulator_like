@@ -142,26 +142,21 @@ class CashRegister
 
       type = hand_element[:type]
       destination = hand_element[:destination]
+      direction = Gosu.angle(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y])
 
       # we want to move the hand element to @hand_destination
       move_speed = 5.0
-      if hand_element[:position][:x] < destination[:x]
-        hand_element[:position][:x] += move_speed
-        hand_element[:position][:x] = destination[:x] if hand_element[:position][:x] > destination[:x]
-      elsif hand_element[:position][:x] > destination[:x]  
-        hand_element[:position][:x] -= move_speed 
-        hand_element[:position][:x] = destination[:x] if hand_element[:position][:x] < destination[:x]
-      end
 
-      if hand_element[:position][:y] < destination[:y]
-        hand_element[:position][:y] += move_speed
-        hand_element[:position][:y] = destination[:y] if hand_element[:position][:y] > destination[:y]
-      elsif hand_element[:position][:y] > destination[:y]  
-        hand_element[:position][:y] -= move_speed 
-        hand_element[:position][:y] = destination[:y] if hand_element[:position][:y] < destination[:y]
+      if (Gosu.distance(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y]) > move_speed)
+        hand_element[:position][:x] += Gosu.offset_x(direction, move_speed)
+        hand_element[:position][:y] += Gosu.offset_y(direction, move_speed)
+      else
+        hand_element[:position][:x] = destination[:x]
+        hand_element[:position][:y] = destination[:y]
       end
 
       rot_speed = 1.0
+
       if hand_element[:position][:angle] < destination[:angle]
         hand_element[:position][:angle] += rot_speed
         hand_element[:position][:angle] = destination[:angle] if hand_element[:position][:angle] > destination[:angle]
