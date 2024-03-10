@@ -85,9 +85,13 @@ class CashRegister
   end
 
   def button_down(id)
-    pick_money if id == Gosu::MS_LEFT
-    cancel_money if id == Gosu::MS_RIGHT
-    set_open if id == Gosu::KB_SPACE && @state == :closed
+    case @state
+    when :opened
+      pick_money if id == Gosu::MS_LEFT
+      cancel_money if id == Gosu::MS_RIGHT
+    when :closed
+      set_open if id == Gosu::KB_SPACE
+    end
   end
 
   def set_open
