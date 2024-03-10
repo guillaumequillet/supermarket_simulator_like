@@ -170,7 +170,7 @@ class CashRegister
   def draw
     render unless defined?(@render)
     @render.draw(0, 0, 0)
-    @font.draw_text("Money : #@money", 10, 10, 1)
+    @font.draw_text("Money : #@money", 10, 480 - @font.height - 10, 1)
     draw_counters
   end
 end
