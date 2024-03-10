@@ -2,11 +2,19 @@ class CashRegister
   def initialize(window)
     @window = window
 
+    @sfx = {
+      bill_movement:    Gosu::Sample.new('./sfx/bill_movement.mp3'),
+      cash_register:    Gosu::Sample.new('./sfx/cash-register-kaching-sound-effect-125042.mp3'),
+      payment_validate: Gosu::Sample.new('./sfx/cash-register-purchase-87313.mp3'),
+      coin_movement:    Gosu::Sample.new('./sfx/coin-drop-39914.mp3'),
+      cancel:           Gosu::Sample.new('./sfx/mag-remove-92075.mp3')
+    }
+
     @gfx = {
-      tiroir: Gosu::Image.new('./gfx/cash_register.png', retro: true),
-      coins: Gosu::Image.load_tiles('./gfx/euro_coins.png', 32, 32, retro: true),
-      billets: Gosu::Image.load_tiles('./gfx/euro_bills.png', 64, 128, retro: true),
-      counter: Gosu::Image.new('./gfx/counter.png', retro: true),
+      cash_register:  Gosu::Image.new('./gfx/cash_register.png', retro: true),
+      coins:          Gosu::Image.load_tiles('./gfx/euro_coins.png', 32, 32, retro: true),
+      bills:          Gosu::Image.load_tiles('./gfx/euro_bills.png', 64, 128, retro: true),
+      counter:        Gosu::Image.new('./gfx/counter.png', retro: true),
       counter_border: Gosu::Image.new('./gfx/counter_border.png', retro: true)
     } 
 
@@ -20,14 +28,14 @@ class CashRegister
       bill_100: [362, 20, 76, 136], 
       bill_200: [442, 20, 76, 136], 
       bill_500: [522, 20, 76, 136], 
-      coin_2e:    [42, 176, 66, 58], 
-      coin_1e:    [112, 176, 66, 58], 
-      coin_50:    [182, 176, 66, 58], 
-      coin_20:    [252, 176, 66, 58], 
-      coin_10:    [322, 176, 66, 58], 
-      coin_5:     [392, 176, 66, 58], 
-      coin_2:     [462, 176, 66, 58], 
-      coin_1:     [532, 176, 66, 58]
+      coin_2e:  [42, 176, 66, 58], 
+      coin_1e:  [112, 176, 66, 58], 
+      coin_50:  [182, 176, 66, 58], 
+      coin_20:  [252, 176, 66, 58], 
+      coin_10:  [322, 176, 66, 58], 
+      coin_5:   [392, 176, 66, 58], 
+      coin_2:   [462, 176, 66, 58], 
+      coin_1:   [532, 176, 66, 58]
     }
 
     @values = {
@@ -38,14 +46,14 @@ class CashRegister
       bill_100: 100, 
       bill_200: 200, 
       bill_500: 500, 
-      coin_2e:    2, 
-      coin_1e:    1, 
-      coin_50:    0.5, 
-      coin_20:    0.2, 
-      coin_10:    0.1, 
-      coin_5:     0.05, 
-      coin_2:     0.02, 
-      coin_1:     0.01
+      coin_2e:  2, 
+      coin_1e:  1, 
+      coin_50:  0.5, 
+      coin_20:  0.2, 
+      coin_10:  0.1, 
+      coin_5:   0.05, 
+      coin_2:   0.02, 
+      coin_1:   0.01
     }
 
     @counters = {
@@ -56,14 +64,14 @@ class CashRegister
       bill_100: 0, 
       bill_200: 0, 
       bill_500: 0, 
-      coin_2e:    0, 
-      coin_1e:    0, 
-      coin_50:    0, 
-      coin_20:    0, 
-      coin_10:    0, 
-      coin_5:     0, 
-      coin_2:     0, 
-      coin_1:     0
+      coin_2e:  0, 
+      coin_1e:  0, 
+      coin_50:  0, 
+      coin_20:  0, 
+      coin_10:  0, 
+      coin_5:   0, 
+      coin_2:   0, 
+      coin_1:   0
     }
 
     @money = 0
@@ -96,6 +104,7 @@ class CashRegister
         @money -= @values[type]
         @money = @money.round(2)
         @counters[type] -= 1 
+        @sfx[:cancel].play
       end
       break
     end
@@ -132,6 +141,8 @@ class CashRegister
       }
       @hand_elements.push hand_element
       @counters[type] += 1
+      @sfx[:bill_movement].play if type.to_s.start_with?('bill')
+      @sfx[:coin_movement].play if type.to_s.start_with?('coin')
       break
     end
   end
@@ -180,9 +191,9 @@ class CashRegister
   end
 
   def render
-    @render = Gosu.render(@gfx[:tiroir].width, @gfx[:tiroir].height, retro: true) do
+    @render = Gosu.render(@gfx[:cash_register].width, @gfx[:cash_register].height, retro: true) do
       # drawing of the cash register itself
-      @gfx[:tiroir].draw(0, 0, 0)
+      @gfx[:cash_register].draw(0, 0, 0)
 
       # billets drawing
       @areas.keys.each_with_index do |type, i|
@@ -191,7 +202,7 @@ class CashRegister
         if type.to_s.start_with?('bill')
           x += @billet_offset[0]
           y += @billet_offset[1]
-          @gfx[:billets][i].draw(x, y, 0)
+          @gfx[:bills][i].draw(x, y, 0)
         elsif type.to_s.start_with?('coin')
           # we want to draw a few coins of each time, with random position
           i = i - 7 # we want to count from first coin
@@ -239,7 +250,7 @@ class CashRegister
       i = @areas.keys.index(type)
 
       if type.to_s.start_with?('bill')
-        @gfx[:billets][i].draw_rot(x, y, 0, angle)
+        @gfx[:bills][i].draw_rot(x, y, 0, angle)
       elsif type.to_s.start_with?('coin')
         i = i - 7 # we want to count from first coin
         @gfx[:coins][i].draw_rot(x, y, 0, angle)
