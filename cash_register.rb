@@ -1,8 +1,7 @@
 class CashRegister
   def initialize(window)
     @window = window
-    @opened = false
-    @opening = false
+    @state = :closed
 
     @sfx = {
       bill_movement:    Gosu::Sample.new('./sfx/bill_movement.mp3'),
@@ -88,11 +87,11 @@ class CashRegister
   def button_down(id)
     pick_money if id == Gosu::MS_LEFT
     cancel_money if id == Gosu::MS_RIGHT
-    set_open if id == Gosu::KB_SPACE && !@opened
+    set_open if id == Gosu::KB_SPACE && @state == :closed
   end
 
   def set_open
-    @opening = true
+    @state = :opening
     @opening_offset_y = -@gfx[:cash_register].height
     @sfx[:cash_register].play
   end
@@ -196,14 +195,14 @@ class CashRegister
   end
 
   def update(dt)
-    if @opened
+    case @state
+    when :opened
       update_hand_elements(dt)
-    elsif @opening
+    when :opening
       cash_register_speed = 1.2
       @opening_offset_y += dt * cash_register_speed 
       if @opening_offset_y >= 0
-        @opened = true
-        @opening = false
+        @state = :opened
       end
     end
   end
@@ -278,12 +277,13 @@ class CashRegister
 
   def draw
     render unless defined?(@render)
-    if @opened
+    case @state
+    when :opened
       @render.draw(0, 0, 0)
       @font.draw_text("Money : #@money", 10, 480 - @font.height - 10, 1)
       draw_counters
       draw_hand_elements
-    elsif @opening
+    when :opening
       @render.draw(0, @opening_offset_y, 0)
     end
   end
