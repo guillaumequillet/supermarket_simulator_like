@@ -17,7 +17,12 @@ class Window < Gosu::Window
   end
 
   def update
-    @cash_register.update
+    @dt ||= Gosu::milliseconds
+    @dt = Gosu::milliseconds - @dt
+    
+    @cash_register.update(@dt)
+
+    @dt = Gosu::milliseconds
   end
   
   def draw

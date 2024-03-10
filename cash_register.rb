@@ -1,10 +1,12 @@
 class CashRegister
   def initialize(window)
     @window = window
+    @opened = false
+    @opening = false
 
     @sfx = {
       bill_movement:    Gosu::Sample.new('./sfx/bill_movement.mp3'),
-      cash_register:    Gosu::Sample.new('./sfx/cash-register-kaching-sound-effect-125042.mp3'),
+      cash_register:    Gosu::Sample.new('./sfx/cash_register.mp3'),
       payment_validate: Gosu::Sample.new('./sfx/cash-register-purchase-87313.mp3'),
       coin_movement:    Gosu::Sample.new('./sfx/coin-drop-39914.mp3'),
       cancel:           Gosu::Sample.new('./sfx/mag-remove-92075.mp3')
@@ -86,6 +88,13 @@ class CashRegister
   def button_down(id)
     pick_money if id == Gosu::MS_LEFT
     cancel_money if id == Gosu::MS_RIGHT
+    set_open if id == Gosu::KB_SPACE && !@opened
+  end
+
+  def set_open
+    @opening = true
+    @opening_offset_y = -@gfx[:cash_register].height
+    @sfx[:cash_register].play
   end
 
   def cancel_money
@@ -148,7 +157,7 @@ class CashRegister
     end
   end
 
-  def update_hand_elements
+  def update_hand_elements(dt)
     @hand_elements.each do |hand_element|
       next if hand_element[:in_place]
 
@@ -157,7 +166,7 @@ class CashRegister
       direction = Gosu.angle(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y])
 
       # we want to move the hand element to @hand_destination
-      move_speed = 8.0
+      move_speed = 1.2 * dt
 
       if (Gosu.distance(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y]) > move_speed)
         hand_element[:position][:x] += Gosu.offset_x(direction, move_speed)
@@ -167,7 +176,7 @@ class CashRegister
         hand_element[:position][:y] = destination[:y]
       end
 
-      rot_speed = 1.0
+      rot_speed = 0.3 * dt
 
       if hand_element[:position][:angle] < destination[:angle]
         hand_element[:position][:angle] += rot_speed
@@ -187,8 +196,17 @@ class CashRegister
     end
   end
 
-  def update
-    update_hand_elements
+  def update(dt)
+    if @opened
+      update_hand_elements(dt)
+    elsif @opening
+      cash_register_speed = 1.2
+      @opening_offset_y += dt * cash_register_speed 
+      if @opening_offset_y >= 0
+        @opened = true
+        @opening = false
+      end
+    end
   end
 
   def render
@@ -261,9 +279,13 @@ class CashRegister
 
   def draw
     render unless defined?(@render)
-    @render.draw(0, 0, 0)
-    @font.draw_text("Money : #@money", 10, 480 - @font.height - 10, 1)
-    draw_counters
-    draw_hand_elements
+    if @opened
+      @render.draw(0, 0, 0)
+      @font.draw_text("Money : #@money", 10, 480 - @font.height - 10, 1)
+      draw_counters
+      draw_hand_elements
+    elsif @opening
+      @render.draw(0, @opening_offset_y, 0)
+    end
   end
 end
