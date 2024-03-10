@@ -77,7 +77,7 @@ class CashRegister
     @money = 0
     @hand_elements = []
     @hand_destination = {x: @window.width / 2, y: @window.height - 100}
-    @hand_destination_coins = {x: @window.width / 2 - 100, y: @window.height - 100}
+    @hand_destination_coins = {x: @window.width / 2 - 200, y: @window.height - 100}
 
     options = {name: './gfx/rainyhearts.ttf', retro: true, bold: true}
     @font = Gosu::Font.new(30, options)
@@ -86,7 +86,6 @@ class CashRegister
   def button_down(id)
     pick_money if id == Gosu::MS_LEFT
     cancel_money if id == Gosu::MS_RIGHT
-    p @hand_elements.inspect if id == Gosu::KB_SPACE
   end
 
   def cancel_money
@@ -121,9 +120,11 @@ class CashRegister
       next if y2 > y + h
 
       destination = type.to_s.start_with?('coin') ? @hand_destination_coins : @hand_destination
-      dest_x = destination[:x] + Gosu.random(-20, 20)
-      dest_y = destination[:y] + Gosu.random(-20, 20)
-      dest_angle = Gosu.random(-20, 20)
+      place_variation = 30
+      angle_variation = 40
+      dest_x = destination[:x] + Gosu.random(-place_variation, place_variation)
+      dest_y = destination[:y] + Gosu.random(-place_variation, place_variation)
+      dest_angle = Gosu.random(-angle_variation, angle_variation)
 
       hand_element = {
         type: type,
