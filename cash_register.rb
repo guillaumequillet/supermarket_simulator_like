@@ -67,6 +67,10 @@ class CashRegister
     }
 
     @money = 0
+    @hand_elements = []
+    @hand_destination = {x: @window.width / 2, y: @window.height - 100}
+    @hand_destination_coins = {x: @window.width / 2 - 100, y: @window.height - 100}
+
     options = {name: './gfx/rainyhearts.ttf', retro: true, bold: true}
     @font = Gosu::Font.new(30, options)
   end
@@ -74,6 +78,7 @@ class CashRegister
   def button_down(id)
     pick_money if id == Gosu::MS_LEFT
     cancel_money if id == Gosu::MS_RIGHT
+    p @hand_elements.inspect if id == Gosu::KB_SPACE
   end
 
   def cancel_money
@@ -86,6 +91,8 @@ class CashRegister
       next if x2 > x + w
       next if y2 > y + h
       if @counters[type] > 0
+        element_to_delete = @hand_elements.find_index {|e| e[:type] == type}
+        @hand_elements.delete_at(element_to_delete)
         @money -= @values[type]
         @money = @money.round(2)
         @counters[type] -= 1 
@@ -103,14 +110,78 @@ class CashRegister
       next if y2 < y
       next if x2 > x + w
       next if y2 > y + h
-      @money += @values[type]
-      @money = @money.round(2)
+
+      destination = type.to_s.start_with?('coin') ? @hand_destination_coins : @hand_destination
+      dest_x = destination[:x] + Gosu.random(-20, 20)
+      dest_y = destination[:y] + Gosu.random(-20, 20)
+      dest_angle = Gosu.random(-20, 20)
+
+      hand_element = {
+        type: type,
+        position: {
+          x: @areas[type][0] + @areas[type][2] / 2,
+          y: @areas[type][1] + @areas[type][3] / 2,
+          angle: 0
+        },
+        destination: {
+          x: dest_x,
+          y: dest_y,
+          angle: dest_angle
+        },
+        in_place: false
+      }
+      @hand_elements.push hand_element
       @counters[type] += 1
       break
     end
   end
 
+  def update_hand_elements
+    @hand_elements.each do |hand_element|
+      next if hand_element[:in_place]
+
+      type = hand_element[:type]
+      destination = hand_element[:destination]
+
+      # we want to move the hand element to @hand_destination
+      move_speed = 5.0
+      if hand_element[:position][:x] < destination[:x]
+        hand_element[:position][:x] += move_speed
+        hand_element[:position][:x] = destination[:x] if hand_element[:position][:x] > destination[:x]
+      elsif hand_element[:position][:x] > destination[:x]  
+        hand_element[:position][:x] -= move_speed 
+        hand_element[:position][:x] = destination[:x] if hand_element[:position][:x] < destination[:x]
+      end
+
+      if hand_element[:position][:y] < destination[:y]
+        hand_element[:position][:y] += move_speed
+        hand_element[:position][:y] = destination[:y] if hand_element[:position][:y] > destination[:y]
+      elsif hand_element[:position][:y] > destination[:y]  
+        hand_element[:position][:y] -= move_speed 
+        hand_element[:position][:y] = destination[:y] if hand_element[:position][:y] < destination[:y]
+      end
+
+      rot_speed = 1.0
+      if hand_element[:position][:angle] < destination[:angle]
+        hand_element[:position][:angle] += rot_speed
+        hand_element[:position][:angle] = destination[:angle] if hand_element[:position][:angle] > destination[:angle]
+      elsif hand_element[:position][:angle] > destination[:angle]
+        hand_element[:position][:angle] -= rot_speed
+        hand_element[:position][:angle] = destination[:angle] if hand_element[:position][:angle] < destination[:angle]
+      end
+
+      # if it reached it, we set :in_place to true and add the money
+      hand_element[:in_place] = (hand_element[:position][:x] == destination[:x]) && (hand_element[:position][:y] == destination[:y]) && (hand_element[:position][:angle] == destination[:angle])
+
+      if hand_element[:in_place]
+        @money += @values[type]
+        @money = @money.round(2)
+      end
+    end
+  end
+
   def update
+    update_hand_elements
   end
 
   def render
@@ -167,10 +238,25 @@ class CashRegister
     end
   end
 
+  def draw_hand_elements
+    @hand_elements.each do |hand_element|
+      type, x, y, angle = hand_element[:type], hand_element[:position][:x], hand_element[:position][:y], hand_element[:position][:angle]
+      i = @areas.keys.index(type)
+
+      if type.to_s.start_with?('billet')
+        @gfx[:billets][i].draw_rot(x, y, 0, angle)
+      elsif type.to_s.start_with?('coin')
+        i = i - 7 # we want to count from first coin
+        @gfx[:coins][i].draw_rot(x, y, 0, angle)
+      end
+    end
+  end
+
   def draw
     render unless defined?(@render)
     @render.draw(0, 0, 0)
     @font.draw_text("Money : #@money", 10, 480 - @font.height - 10, 1)
     draw_counters
+    draw_hand_elements
   end
 end
