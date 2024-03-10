@@ -90,15 +90,27 @@ class CashRegister
     when :opened
       pick_money if id == Gosu::MS_LEFT
       cancel_money if id == Gosu::MS_RIGHT
+      set_closed if id == Gosu::KB_SPACE
     when :closed
       @opening_offset_y = -@gfx[:cash_register].height + 48
-      set_open if id == Gosu::KB_SPACE
+      set_opened if id == Gosu::KB_SPACE
     end
   end
 
-  def set_open
+  def set_opened
     @state = :opening
     @sfx[:cash_register].play
+  end
+
+  def set_closed
+    @state = :closing
+
+    # todo : check that given money is OK
+    if @money > 0
+      @sfx[:payment_validate].play
+    else
+      @sfx[:cash_register].play
+    end
   end
 
   def cancel_money
@@ -207,7 +219,14 @@ class CashRegister
       cash_register_speed = 1.2
       @opening_offset_y += dt * cash_register_speed 
       if @opening_offset_y >= 0
+        @opening_offset_y = 0
         @state = :opened
+      end
+    when :closing
+      cash_register_speed = 1.2
+      @opening_offset_y -= dt * cash_register_speed 
+      if @opening_offset_y <= -@render.height + 48
+        @state = :closed
       end
     end
   end
@@ -290,6 +309,8 @@ class CashRegister
       draw_counters
       draw_hand_elements
     when :opening
+      @render.draw(0, @opening_offset_y, 0)
+    when :closing
       @render.draw(0, @opening_offset_y, 0)
     when :closed
       @render.draw(0, -@render.height + 48, 0)
