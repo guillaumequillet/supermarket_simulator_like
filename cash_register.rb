@@ -167,6 +167,7 @@ class CashRegister
 
       # we want to move the hand element to @hand_destination
       move_speed = 1.2 * dt
+      rot_speed = 0.3 * dt
 
       if (Gosu.distance(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y]) > move_speed)
         hand_element[:position][:x] += Gosu.offset_x(direction, move_speed)
@@ -175,8 +176,6 @@ class CashRegister
         hand_element[:position][:x] = destination[:x]
         hand_element[:position][:y] = destination[:y]
       end
-
-      rot_speed = 0.3 * dt
 
       if hand_element[:position][:angle] < destination[:angle]
         hand_element[:position][:angle] += rot_speed
