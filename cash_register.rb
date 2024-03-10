@@ -90,13 +90,13 @@ class CashRegister
       pick_money if id == Gosu::MS_LEFT
       cancel_money if id == Gosu::MS_RIGHT
     when :closed
+      @opening_offset_y = -@gfx[:cash_register].height + 48
       set_open if id == Gosu::KB_SPACE
     end
   end
 
   def set_open
     @state = :opening
-    @opening_offset_y = -@gfx[:cash_register].height
     @sfx[:cash_register].play
   end
 
@@ -132,8 +132,8 @@ class CashRegister
       next if y2 > y + h
 
       destination = type.to_s.start_with?('coin') ? @hand_destination_coins : @hand_destination
-      place_variation = 30
-      angle_variation = 40
+      place_variation = 15
+      angle_variation = 20
       dest_x = destination[:x] + Gosu.random(-place_variation, place_variation)
       dest_y = destination[:y] + Gosu.random(-place_variation, place_variation)
       dest_angle = Gosu.random(-angle_variation, angle_variation)
@@ -289,6 +289,8 @@ class CashRegister
       draw_hand_elements
     when :opening
       @render.draw(0, @opening_offset_y, 0)
+    when :closed
+      @render.draw(0, -@render.height + 48, 0)
     end
   end
 end
