@@ -3,7 +3,7 @@ class CashRegister
     @window = window
 
     @gfx = {
-      tiroir: Gosu::Image.new('./gfx/tiroir_caisse.png', retro: true),
+      tiroir: Gosu::Image.new('./gfx/cash_register.png', retro: true),
       coins: Gosu::Image.load_tiles('./gfx/euro_coins.png', 32, 32, retro: true),
       billets: Gosu::Image.load_tiles('./gfx/euro_billets.png', 64, 128, retro: true),
       counter: Gosu::Image.new('./gfx/counter.png', retro: true),
