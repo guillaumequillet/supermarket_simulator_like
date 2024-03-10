@@ -67,7 +67,8 @@ class CashRegister
     }
 
     @money = 0
-    @font = Gosu::Font.new(20, name: Gosu::default_font_name)
+    options = {name: './gfx/rainyhearts.ttf', retro: true, bold: true}
+    @font = Gosu::Font.new(30, options)
   end
 
   def button_down(id)
@@ -152,6 +153,10 @@ class CashRegister
       text_y = y - @font.height / 2
 
       # white stroke
+      @font.draw_text(value, text_x - 1, text_y - 1, 1, 1, 1, Gosu::Color::WHITE)
+      @font.draw_text(value, text_x + 1, text_y - 1, 1, 1, 1, Gosu::Color::WHITE)
+      @font.draw_text(value, text_x - 1, text_y + 1, 1, 1, 1, Gosu::Color::WHITE)
+      @font.draw_text(value, text_x + 1, text_y + 1, 1, 1, 1, Gosu::Color::WHITE)
       @font.draw_text(value, text_x, text_y + 1, 1, 1, 1, Gosu::Color::WHITE)
       @font.draw_text(value, text_x, text_y - 1, 1, 1, 1, Gosu::Color::WHITE)
       @font.draw_text(value, text_x - 1, text_y, 1, 1, 1, Gosu::Color::WHITE)
