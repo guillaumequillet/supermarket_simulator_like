@@ -5,7 +5,7 @@ class CashRegister
     @gfx = {
       tiroir: Gosu::Image.new('./gfx/cash_register.png', retro: true),
       coins: Gosu::Image.load_tiles('./gfx/euro_coins.png', 32, 32, retro: true),
-      billets: Gosu::Image.load_tiles('./gfx/euro_billets.png', 64, 128, retro: true),
+      billets: Gosu::Image.load_tiles('./gfx/euro_bills.png', 64, 128, retro: true),
       counter: Gosu::Image.new('./gfx/counter.png', retro: true),
       counter_border: Gosu::Image.new('./gfx/counter_border.png', retro: true)
     } 
@@ -13,13 +13,13 @@ class CashRegister
     @billet_offset = [6, 4]
 
     @areas = {
-      billet_5:   [42, 20, 76, 136], 
-      billet_10:  [122, 20, 76, 136], 
-      billet_20:  [202, 20, 76, 136], 
-      billet_50:  [282, 20, 76, 136], 
-      billet_100: [362, 20, 76, 136], 
-      billet_200: [442, 20, 76, 136], 
-      billet_500: [522, 20, 76, 136], 
+      bill_5:   [42, 20, 76, 136], 
+      bill_10:  [122, 20, 76, 136], 
+      bill_20:  [202, 20, 76, 136], 
+      bill_50:  [282, 20, 76, 136], 
+      bill_100: [362, 20, 76, 136], 
+      bill_200: [442, 20, 76, 136], 
+      bill_500: [522, 20, 76, 136], 
       coin_2e:    [42, 176, 66, 58], 
       coin_1e:    [112, 176, 66, 58], 
       coin_50:    [182, 176, 66, 58], 
@@ -31,13 +31,13 @@ class CashRegister
     }
 
     @values = {
-      billet_5:   5, 
-      billet_10:  10, 
-      billet_20:  20, 
-      billet_50:  50, 
-      billet_100: 100, 
-      billet_200: 200, 
-      billet_500: 500, 
+      bill_5:   5, 
+      bill_10:  10, 
+      bill_20:  20, 
+      bill_50:  50, 
+      bill_100: 100, 
+      bill_200: 200, 
+      bill_500: 500, 
       coin_2e:    2, 
       coin_1e:    1, 
       coin_50:    0.5, 
@@ -49,13 +49,13 @@ class CashRegister
     }
 
     @counters = {
-      billet_5:   0, 
-      billet_10:  0, 
-      billet_20:  0, 
-      billet_50:  0, 
-      billet_100: 0, 
-      billet_200: 0, 
-      billet_500: 0, 
+      bill_5:   0, 
+      bill_10:  0, 
+      bill_20:  0, 
+      bill_50:  0, 
+      bill_100: 0, 
+      bill_200: 0, 
+      bill_500: 0, 
       coin_2e:    0, 
       coin_1e:    0, 
       coin_50:    0, 
@@ -145,7 +145,7 @@ class CashRegister
       direction = Gosu.angle(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y])
 
       # we want to move the hand element to @hand_destination
-      move_speed = 5.0
+      move_speed = 8.0
 
       if (Gosu.distance(hand_element[:position][:x], hand_element[:position][:y], destination[:x], destination[:y]) > move_speed)
         hand_element[:position][:x] += Gosu.offset_x(direction, move_speed)
@@ -188,7 +188,7 @@ class CashRegister
       @areas.keys.each_with_index do |type, i|
         x, y, w, h = @areas[type]
         
-        if type.to_s.start_with?('billet')
+        if type.to_s.start_with?('bill')
           x += @billet_offset[0]
           y += @billet_offset[1]
           @gfx[:billets][i].draw(x, y, 0)
@@ -238,7 +238,7 @@ class CashRegister
       type, x, y, angle = hand_element[:type], hand_element[:position][:x], hand_element[:position][:y], hand_element[:position][:angle]
       i = @areas.keys.index(type)
 
-      if type.to_s.start_with?('billet')
+      if type.to_s.start_with?('bill')
         @gfx[:billets][i].draw_rot(x, y, 0, angle)
       elsif type.to_s.start_with?('coin')
         i = i - 7 # we want to count from first coin
