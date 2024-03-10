@@ -12,6 +12,7 @@ class CashRegister
     }
 
     @gfx = {
+      cash_register_bg:  Gosu::Image.new('./gfx/cash_register_bg.png', retro: true),
       cash_register:  Gosu::Image.new('./gfx/cash_register.png', retro: true),
       coins:          Gosu::Image.load_tiles('./gfx/euro_coins.png', 32, 32, retro: true),
       bills:          Gosu::Image.load_tiles('./gfx/euro_bills.png', 64, 128, retro: true),
@@ -281,6 +282,7 @@ class CashRegister
 
   def draw
     render unless defined?(@render)
+    @gfx[:cash_register_bg].draw(0, 0, 0)
     case @state
     when :opened
       @render.draw(0, 0, 0)
