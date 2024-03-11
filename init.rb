@@ -1,10 +1,13 @@
 require 'gosu'
 require_relative './cash_register.rb'
+require_relative './product_scan.rb'
 
 class Window < Gosu::Window
   def initialize
     super(640, 480, false)
     @cash_register = CashRegister.new(self) 
+
+    @state = :cash_register
   end
   
   def needs_cursor?; true; end
@@ -20,13 +23,19 @@ class Window < Gosu::Window
     @dt ||= Gosu::milliseconds
     @dt = Gosu::milliseconds - @dt
     
-    @cash_register.update(@dt)
-
+    case @state
+    when :cash_register
+      @cash_register.update(@dt)
+    end
+    
     @dt = Gosu::milliseconds
   end
   
   def draw
-    @cash_register.draw
+    case @state
+    when :cash_register
+      @cash_register.draw
+    end
   end
 end
 
