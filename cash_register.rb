@@ -106,8 +106,12 @@ class CashRegister
     @state = :closing
 
     # todo : check that given money is OK
+    # we validate the step by setting money to 0 (given to the customer)
     if @money > 0
       @sfx[:payment_validate].play
+      @money = 0
+      @hand_elements = []
+      @counters.each_key {|key| @counters[key] = 0}
     else
       @sfx[:cash_register].play
     end

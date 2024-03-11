@@ -6,6 +6,7 @@ class Window < Gosu::Window
   def initialize
     super(640, 480, false)
     @cash_register = CashRegister.new(self) 
+    @product_scan = ProductScan.new(self) 
 
     @state = :cash_register
   end
@@ -15,8 +16,13 @@ class Window < Gosu::Window
   def button_down(id)
     super
     exit if id == Gosu::KB_ESCAPE
-
-    @cash_register.button_down(id)
+    
+    case @state
+    when :cash_register
+      @cash_register.button_down(id)
+    when :product_scan
+      @product_scan.button_down(id)
+    end
   end
 
   def update
@@ -26,6 +32,8 @@ class Window < Gosu::Window
     case @state
     when :cash_register
       @cash_register.update(@dt)
+    when :product_scan
+      @product_scan.update(@dt)
     end
     
     @dt = Gosu::milliseconds
@@ -35,6 +43,8 @@ class Window < Gosu::Window
     case @state
     when :cash_register
       @cash_register.draw
+    when :product_scan
+      @product_scan.draw
     end
   end
 end
