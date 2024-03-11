@@ -8,7 +8,7 @@ class Window < Gosu::Window
     @cash_register = CashRegister.new(self) 
     @product_scan = ProductScan.new(self) 
 
-    @state = :cash_register
+    @state = :product_scan
   end
   
   def needs_cursor?; true; end
@@ -22,6 +22,15 @@ class Window < Gosu::Window
       @cash_register.button_down(id)
     when :product_scan
       @product_scan.button_down(id)
+    end
+  end
+
+  def button_up(id)
+    case @state
+    when :cash_register
+      @cash_register.button_up(id)
+    when :product_scan
+      @product_scan.button_up(id)
     end
   end
 

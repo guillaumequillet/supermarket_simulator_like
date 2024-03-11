@@ -83,18 +83,29 @@ class CashRegister
 
     options = {name: './gfx/rainyhearts.ttf', retro: true, bold: true}
     @font = Gosu::Font.new(30, options)
+
+    @keys = {
+      :open => Gosu::KB_SPACE,
+      :close => Gosu::KB_SPACE,
+      :pick_money => Gosu::MS_LEFT,
+      :cancel_money => Gosu::MS_RIGHT
+    }
   end
 
   def button_down(id)
     case @state
     when :opened
-      pick_money if id == Gosu::MS_LEFT
-      cancel_money if id == Gosu::MS_RIGHT
-      set_closed if id == Gosu::KB_SPACE
+      pick_money   if id == @keys[:pick_money]
+      cancel_money if id == @keys[:cancel_money]
+      set_closed   if id == @keys[:close]
     when :closed
       @opening_offset_y = -@gfx[:cash_register].height + 48
-      set_opened if id == Gosu::KB_SPACE
+      set_opened if id == @keys[:open]
     end
+  end
+
+  def button_up(id)
+
   end
 
   def set_opened
