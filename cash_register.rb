@@ -103,6 +103,9 @@ class CashRegister
   end
 
   def set_closed
+    # we can't close the register if some element is flying to destination
+    return if @hand_elements.select{|e| e[:in_place] == false}.size > 0
+
     @state = :closing
 
     # todo : check that given money is OK
