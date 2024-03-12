@@ -8,7 +8,7 @@ class CashRegister
       cash_register:    Gosu::Sample.new('./sfx/cash_register.mp3'),
       payment_validate: Gosu::Sample.new('./sfx/cash-register-purchase-87313.mp3'),
       coin_movement:    Gosu::Sample.new('./sfx/coin-drop-39914.mp3'),
-      cancel:           Gosu::Sample.new('./sfx/mag-remove-92075.mp3')
+      cancel:           Gosu::Sample.new('./sfx/cash_cancel.mp3')
     }
 
     @gfx = {

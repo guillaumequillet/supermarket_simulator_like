@@ -1,3 +1,4 @@
+require 'json'
 require 'gosu'
 require_relative './cash_register.rb'
 require_relative './product_scan.rb'
@@ -7,8 +8,10 @@ class Window < Gosu::Window
     super(640, 480, false)
     @cash_register = CashRegister.new(self) 
     @product_scan = ProductScan.new(self) 
+    @product_scan.spawn_products
 
     @state = :product_scan
+    # @state = :cash_register
   end
   
   def needs_cursor?; true; end

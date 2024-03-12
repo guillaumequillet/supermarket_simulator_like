@@ -1,0 +1,10 @@
+[
+  {
+    "name" : "product1",
+    "label": "label product 1",
+    "price": 2,
+    "size": [180, 200, 50],
+    "barcode": [130, 200, 40, 30],
+    "box_color": [128, 128, 128]
+  }
+]
